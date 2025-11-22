@@ -20,6 +20,7 @@ export default function Home() {
   },[])
 
   const getUserData = async () => {
+   
     try {
       const user = await getUser();
       if (user) {
