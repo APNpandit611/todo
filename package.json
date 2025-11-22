@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
   },
+
   "dependencies": {
     "@clerk/nextjs": "^6.35.4",
     "@prisma/adapter-pg": "^7.0.0",
