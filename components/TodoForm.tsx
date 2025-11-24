@@ -34,7 +34,6 @@ const TodoForm = ({
     const onSubmit = async (data: TodoSchema) => {
         try {
             setLoading(true);
-            console.log("id, data", id, data)
             if (type === "create") {
                 await createTodo(data);
                 toast("Todo created successfully!");
