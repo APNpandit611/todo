@@ -20,4 +20,31 @@ model User {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  todos Todo[]
+  
 }
+// model Category {
+//   id String @id @default(cuid())
+//   name String
+//   createdAt DateTime @default(now())
+
+//   userId String
+//   user User @relation(fields: [userId], references: [id])
+
+//   todos Todo[]
+// }
+model Todo {
+  id String @id @default(cuid())
+  title String
+  isCompleted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  // categoryId String?
+  // category Category? @relation(fields: [categoryId], references: [id])
+}
+

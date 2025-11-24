@@ -1,0 +1,178 @@
+"use client";
+import React, { Dispatch, JSX, useState } from "react";
+import { Button } from "./ui/button";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import Spinner from "./Spinner";
+import { Todo } from "@/app/generated/prisma/client";
+import { deleteTodo } from "@/lib/actions";
+import { Loader, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+// import TeacherForm from "./forms/TeacherForm";
+// import StudentForm from "./forms/StudentForm";
+
+// const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
+//     loading: () => <Spinner/>
+// })
+
+// const StudentForm = dynamic(() => import("./forms/StudentForm"), {
+//     loading: () => <Spinner/>
+// })
+
+const TodoForm = dynamic(() => import("./TodoForm"), {
+    loading: () => <Spinner />,
+});
+
+const forms: {
+    [key: string]: (
+        setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+        type: "create" | "update",
+        data?: Todo,
+        id?:string | undefined,
+    ) => JSX.Element;
+} = {
+    todo: (setOpen, type, data, id) => (
+        <TodoForm setOpen={setOpen} type={type} data={data} id={id}/>
+    ),
+};
+
+const Form = ({
+    type,
+    id,
+    data,
+    setOpen,
+}: {
+    type: "create" | "update" | "delete";
+    id?: string;
+    data?: Todo;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    const [loading, setLoading] = useState<boolean | null>(false);
+    const router = useRouter();
+    const handleDelete = async (e:React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        const res = await deleteTodo(id);
+        if (res.success) {
+            toast("Todo deleted successfully!");
+            setLoading(false);
+            setOpen(false);
+            router.refresh();
+        } else {
+            toast("Failed to delete Todo!");
+        }
+    };
+    if (type === "delete" && id) {
+        return (
+            <form className="p-4 flex flex-col gap-4 items-center justify-center">
+                <span className="text-center font-medium">
+                    All the data will be lost. Are you sure you want to delete
+                    this todo: {data?.title}?
+                </span>
+                <Button
+                    variant="destructive"
+                    className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer"
+                    onClick={handleDelete}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Deleting...
+                        </>
+                    ) : (
+                        "Delete"
+                    )}
+                </Button>
+            </form>
+        );
+    }
+
+    if (type === "create" || type === "update") {
+        return forms["todo"](setOpen, type, data, id);
+    }
+
+    return <div className="p-4">Form not found</div>;
+};
+
+const FormModal = ({
+    // table,
+    type,
+    data,
+    id,
+}: {
+    // table:
+    //     | "teacher"
+    //     | "student"
+    //     | "parent"
+    //     | "class"
+    //     | "subject"
+    //     | "exam"
+    //     | "attendance"
+    //     | "assignment"
+    //     | "event"
+    //     | "announcement"
+    //     | "result"
+    //     | "teacher"
+    //     | "lesson";
+    type: "create" | "update" | "delete";
+    data?: Todo;
+    id?: string | undefined;
+}) => {
+    const size = type === "create" ? "w-9 h-9" : "w-8 h-8";
+    const bgColor =
+        type === "create"
+            ? "bg-yellow"
+            : type === "update"
+            ? "bg-sky"
+            : "bg-purple";
+
+    const [open, setOpen] = useState(false);
+
+    // const Form = () => {
+    //     return type === "delete" && id ? (
+    //         <form action="" className="p-4 flex flex-col gap-4 items-center justify-center">
+    //             <span className="text-center font-medium">All the data will be lost. Are you sure you want to delete this item?</span>
+    //             <Button variant="destructive" className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer">Delete</Button>
+    //         </form>
+    //     ) : type === "create" || type === "update" ? (
+    //        <div>{type}</div>
+    //     ) : "form not found";
+    // }
+    return (
+        <>
+            <button
+                onClick={() => setOpen(true)}
+                className={`${size} hover:-translate-y-0.5 hover:transition-all hover:delay-50 cursor-pointer flex items-center justify-center rounded-full ${bgColor}`}
+                
+            >
+                <Image src={`/${type}.png`} alt="" width={16} height={16} />
+            </button>
+            {open && (
+                <div className="w-screen h-screen fixed left-0 top-0 bg-black/60 backdrop-blur-xs z-[9999] flex items-center justify-center">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-md relative w-[90%] nd:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+                        <Form
+                            type={type}
+                            setOpen={setOpen}
+                            id={id}
+                            data={data}
+                        />
+                        <div
+                            className="absolute top-3 right-3 cursor-pointer"
+                            onClick={() => setOpen(false)}
+                        >
+                            <Image
+                                src="/close.png"
+                                alt=""
+                                width={14}
+                                height={14}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default FormModal;
