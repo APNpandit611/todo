@@ -72,6 +72,9 @@ export const getTodos = async ({
         const [data, count] = await prisma.$transaction([
             prisma.todo.findMany({
                 where: query,
+                orderBy: {
+                    updatedAt: "desc"
+                },
                 take: ITEM_PER_PAGE,
                 skip: ITEM_PER_PAGE * (p - 1),
             }),

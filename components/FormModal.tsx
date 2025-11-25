@@ -96,25 +96,11 @@ const Form = ({
 };
 
 const FormModal = ({
-    // table,
     type,
     data,
     id,
 }: {
-    // table:
-    //     | "teacher"
-    //     | "student"
-    //     | "parent"
-    //     | "class"
-    //     | "subject"
-    //     | "exam"
-    //     | "attendance"
-    //     | "assignment"
-    //     | "event"
-    //     | "announcement"
-    //     | "result"
-    //     | "teacher"
-    //     | "lesson";
+   
     type: "create" | "update" | "delete";
     data?: Todo;
     id?: string | undefined;
@@ -149,7 +135,7 @@ const FormModal = ({
                 <Image src={`/${type}.png`} alt="" width={16} height={16} />
             </button>
             {open && (
-                <div className="w-screen h-screen fixed left-0 top-0 bg-black/60 backdrop-blur-xs z-[9999] flex items-center justify-center">
+                <div className="w-screen h-screen fixed left-0 top-0 bg-black/60 dark:bg-black/40 backdrop-blur-xs z-[9999] flex items-center justify-center">
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-md relative w-[90%] nd:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
                         <Form
                             type={type}

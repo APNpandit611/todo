@@ -28,7 +28,7 @@ const Navbar = async () => {
                     {/* <Link href="/history" className="hover:underline text-sm uppercase font-semibold">
                         History
                     </Link> */}
-                    <Switch />
+                    {/* <Switch /> */}
                     <div className="flex items-center gap-x-3 md:p-2.5 shadow-md rounded-full md:rounded-md border dark:border-white">
                         <div className="hidden md:flex md:items-center md:gap-3">
                             <div className="flex flex-col text-right">
