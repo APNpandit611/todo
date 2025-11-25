@@ -1,33 +1,29 @@
-"use server";
+// import { prisma } from "@/lib/prisma";
+// import type { User } from "@clerk/nextjs/server";
 
-import {prisma} from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
+// export const createUser = async (user: User) => {
+//     try {
+//         const existingUser = await prisma.user.findUnique({
+//             where: {
+//                 id: user.id,
+//             },
+//         });
 
-const createUser = async () => {
-    try {
-        const user = await currentUser();
-        if (!user) return null;
+//         if (!existingUser) {
+//             await prisma.user.create({
+//                 data: {
+//                     id: user.id,
+//                     email: user.emailAddresses[0].emailAddress,
+//                     name: `${user.firstName ?? ""} ${
+//                         user.lastName ?? ""
+//                     }`.trim(),
+//                 },
+//             });
+//         }
 
-        const existingUser = await prisma.user.findUnique({
-            where: {
-                id: user.id,
-            },
-        });
-
-        if (!existingUser) {
-            await prisma.user.create({
-                data: {
-                    id: user.id,
-                    email: user.emailAddresses[0].emailAddress,
-                    name: `${user.firstName ?? ""} ${
-                        user.lastName ?? ""
-                    }`.trim(),
-                },
-            });
-        }
-    } catch (error) {
-        console.error("Error creating user:", error);
-    }
-};
-
-export default createUser;
+//         return { success: true, error: false };
+//     } catch (error) {
+//         console.error("Error creating user:", error);
+//         return { success: false, error: true };
+//     }
+// };

@@ -24,18 +24,7 @@ const TodoLists = async () => {
         );
     }
 
-    // 3. Fetch the todos from the database for that specific user
-    // const todos = await prisma.todo.findMany({
-    //     where: {
-    //         userId: user.id,
-    //     },
-    //     orderBy: {
-    //         createdAt: "desc",
-    //     },
-    // });
-
     const todos = await getTodos();
-
     // 4. Handle the case where there are no todos
     if (todos.data?.length === 0) {
         return (
@@ -85,8 +74,8 @@ const TodoLists = async () => {
                             </div>
                         </div>
                         <div className="flex items-center justify-end gap-3">
-                            <FormModal type="delete" id={todo.id} data={todo} />
                             <FormModal type="update" id={todo.id} data={todo} />
+                            <FormModal type="delete" id={todo.id} data={todo} />
                         </div>
                     </div>
                 ))}
