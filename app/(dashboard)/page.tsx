@@ -4,14 +4,16 @@ import TodoSearch from "@/components/TodoSearch";
 import { createUser } from "@/lib/actions";
 import { currentUser } from "@clerk/nextjs/server";
 
-
-export default async function Home() {
-    const user = await currentUser()
-    const res = await createUser(user)
-    console.log("result is :", res)
+export default async function Home({
+    searchParams,
+}: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+    const user = await currentUser();
+    await createUser(user);
     return (
         <div className="max-w-7xl mx-auto bg-transparent px-4 dark:bg-slate-900 dark:text-white dark:border-slate-700">
-            <div className=" p-4 mb-2 shadow-md flex items-center justify-between">
+            <div className="my-2 sticky top-2 z-50 bg-white dark:bg-slate-900 p-4 shadow-md flex items-center justify-between">
                 <h1 className="text-xl font-bold">Lists</h1>
                 <div className="flex flex-row gap-2">
                     <div className="hidden md:flex">
@@ -21,7 +23,7 @@ export default async function Home() {
                     {/* <TodoLists userId={user?.id}/> */}
                 </div>
             </div>
-            <TodoLists />
+            <TodoLists searchParams={searchParams} />
         </div>
     );
 }

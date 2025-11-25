@@ -3,7 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { TodoSchema } from "./formValidationSchemas";
 import { prisma } from "./prisma";
 import type { User } from "@clerk/nextjs/server";
-
+import { Prisma } from "@/app/generated/prisma/client";
 
 export const createTodo = async (data: TodoSchema) => {
     try {
@@ -25,18 +25,59 @@ export const createTodo = async (data: TodoSchema) => {
     }
 };
 
-export const getTodos = async () => {
+export const getTodos = async ({
+    p,
+    queryParams,
+}: {
+    p: number;
+    queryParams: { [key: string]: string | undefined };
+}) => {
+    const ITEM_PER_PAGE = 5;
+    const user = await currentUser();
+    const query: Prisma.TodoWhereInput = {
+        userId: user?.id,
+    };
+
     try {
-        const user = await currentUser();
-        const data = await prisma.todo.findMany({
-            where: {
-                userId: user?.id,
-            },
-            orderBy: {
-                updatedAt: "desc",
-            },
-        });
-        return { data: data, success: true, error: false };
+        // const data = await prisma.todo.findMany({
+        //     where: {
+        //         userId: user?.id,
+        //     },
+        //     orderBy: {
+        //         updatedAt: "desc",
+        //     },
+        // });
+
+        if (queryParams) {
+            for (const [key, value] of Object.entries(queryParams)) {
+                if (value !== undefined) {
+                    switch (key) {
+                        case "search":
+                            query.OR = [
+                                {
+                                    title: {
+                                        contains: value,
+                                        mode: "insensitive",
+                                    },
+                                },
+                            ];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        const [data, count] = await prisma.$transaction([
+            prisma.todo.findMany({
+                where: query,
+                take: ITEM_PER_PAGE,
+                skip: ITEM_PER_PAGE * (p - 1),
+            }),
+            prisma.todo.count({ where: query }),
+        ]);
+        return { data: data, count: count, success: true, error: false };
     } catch (error) {
         console.log(error);
         return { success: false, error: true };
@@ -45,13 +86,13 @@ export const getTodos = async () => {
 
 export const deleteTodo = async (todoId: string | undefined) => {
     try {
-        const user = await currentUser()
+        const user = await currentUser();
         await prisma.todo.delete({
             where: {
                 id: todoId,
                 userId: user?.id,
             },
-        }); 
+        });
         return { success: true, error: false };
     } catch (error) {
         console.log(error);
@@ -90,7 +131,7 @@ export const updateTodo = async (
         });
 
         // only updateMany has .count property not update
-        if (updatedTodo.count === 0) return { success:false, error: true}
+        if (updatedTodo.count === 0) return { success: false, error: true };
 
         return { success: true, error: false };
     } catch (error) {
