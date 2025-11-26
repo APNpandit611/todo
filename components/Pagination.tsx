@@ -33,7 +33,7 @@ const Pagination = ({ page, count }: { page: number | undefined; count: number |
                             <button
                                 key={pageIndex}
                                 className={`px-2 py-1 rounded-sm text-white ${
-                                    page === pageIndex ? "bg-gradient-to-r from-indigo-600 to-blue-600" : "bg-slate-300"
+                                    page === pageIndex ? "bg-gradient-to-r from-gray-600 to-gray-400" : "bg-slate-300"
                                 } cursor-pointer`}
                                 onClick={() => changePage(pageIndex)}
                             >

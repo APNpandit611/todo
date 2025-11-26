@@ -1,8 +1,10 @@
 import FormModal from "@/components/FormModal";
+import { TodoListLoader } from "@/components/TodoListLoader";
 import TodoLists from "@/components/TodoLists";
 import TodoSearch from "@/components/TodoSearch";
 import { createUser } from "@/lib/actions";
 import { currentUser } from "@clerk/nextjs/server";
+import { Suspense } from "react";
 
 export default async function Home({
     searchParams,
@@ -23,7 +25,9 @@ export default async function Home({
                     {/* <TodoLists userId={user?.id}/> */}
                 </div>
             </div>
-            <TodoLists searchParams={searchParams} />
+            <Suspense fallback={<TodoListLoader />}>
+                <TodoLists searchParams={searchParams} />
+            </Suspense>
         </div>
     );
 }

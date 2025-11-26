@@ -73,7 +73,7 @@ export const getTodos = async ({
             prisma.todo.findMany({
                 where: query,
                 orderBy: {
-                    updatedAt: "desc"
+                    updatedAt: "desc",
                 },
                 take: ITEM_PER_PAGE,
                 skip: ITEM_PER_PAGE * (p - 1),
@@ -175,5 +175,14 @@ export async function getUserData(userId: string | undefined) {
 
     return prisma.user.findUnique({
         where: { id: userId },
+    });
+}
+
+export async function toggleTodo(checked: boolean, todoId: string) {
+    await prisma.todo.update({
+        where: { id: todoId },
+        data: {
+            isCompleted: checked,
+        },
     });
 }

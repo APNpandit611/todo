@@ -1,5 +1,3 @@
-
-
 import { currentUser } from "@clerk/nextjs/server";
 import { formatDistanceToNow } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -7,11 +5,16 @@ import { Checkbox } from "./ui/checkbox";
 import FormModal from "./FormModal";
 import { getTodos } from "@/lib/actions";
 import Pagination from "./Pagination";
+import TodoCheck from "./TodoCheck";
 
-const TodoLists = async ({ searchParams }:{searchParams: Promise<{[key:string]:string | undefined}>}) => {
+const TodoLists = async ({
+    searchParams,
+}: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+}) => {
     const user = await currentUser();
-    const { page, ...queryParams} = await searchParams
-    const p = page ? parseInt(page) : 1
+    const { page, ...queryParams } = await searchParams;
+    const p = page ? parseInt(page) : 1;
 
     // 2. If no user, show a message or redirect
     if (!user) {
@@ -25,7 +28,7 @@ const TodoLists = async ({ searchParams }:{searchParams: Promise<{[key:string]:s
     }
 
     //fetch the data and queryparams
-    const todos = await getTodos({p, queryParams});
+    const todos = await getTodos({ p, queryParams });
 
     // 4. Handle the case where there are no todos
     if (todos.data?.length === 0) {
@@ -37,6 +40,7 @@ const TodoLists = async ({ searchParams }:{searchParams: Promise<{[key:string]:s
             </div>
         );
     }
+
 
     // 5. Render the list of todos
     return (
@@ -50,8 +54,9 @@ const TodoLists = async ({ searchParams }:{searchParams: Promise<{[key:string]:s
                             key={todo.id}
                             className="flex flex-col md:flex-row md:gap-4 p-4 rounded-lg border dark:bg-slate-900 border-gray-200 dark:border-slate-700 shadow-sm"
                         >
-                            <div className="flex gap-3 w-full">
-                                <Checkbox className="h-5 w-5 mt-1" />
+                            <div className="flex items-center gap-3 w-full">
+                                    <TodoCheck isChecked={todo.isCompleted} todoId={todo.id}/>
+                                
                                 <div className="flex-1 space-y-1">
                                     <h4
                                         className={`text-base font-medium leading-relaxed ${
@@ -96,8 +101,6 @@ const TodoLists = async ({ searchParams }:{searchParams: Promise<{[key:string]:s
 };
 
 export default TodoLists;
-
-
 
 // "use client"; // make it a Client Component to handle loading states
 
