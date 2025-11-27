@@ -5,7 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import Spinner from "./Spinner";
 import { Todo } from "@/app/generated/prisma/client";
-import { deleteTodo } from "@/lib/actions";
+import { deleteTodo, moveToTrash } from "@/lib/actions";
 import { Loader, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ const Form = ({
     data,
     setOpen,
 }: {
-    type: "create" | "update" | "delete";
+    type: "create" | "update" | "delete" | "moveToTrash";
     id?: string;
     data?: Todo;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,12 +63,27 @@ const Form = ({
             toast("Failed to delete Todo!");
         }
     };
+
+    const handleMoveToTrash = async (e:React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        setLoading(true)
+        const res = await moveToTrash(id)
+        if (res.success) {
+            toast("Todo Moved to Bin Successfully!");
+            setLoading(false);
+            setOpen(false);
+            router.refresh();
+        } else {
+            toast("Failed to Move Todo!");
+        }
+    }
+
     if (type === "delete" && id) {
         return (
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
                     All the data will be lost. Are you sure you want to delete
-                    this todo: {data?.title}?
+                    this todo: <span className="text-bold">{data?.title}</span>?
                 </span>
                 <Button
                     variant="destructive"
@@ -88,6 +103,31 @@ const Form = ({
         );
     }
 
+    if (type === "moveToTrash" && id) {
+        return (
+            <form className="p-4 flex flex-col gap-4 items-center justify-center">
+                <span className="text-center font-medium">
+                Are you sure you want to move
+                    this todo: <span className="text-bold">{data?.title}</span> to recycle bin?
+                </span>
+                <Button
+                    variant="destructive"
+                    className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer"
+                    onClick={handleMoveToTrash}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Moving...
+                        </>
+                    ) : (
+                        "Sure"
+                    )}
+                </Button>
+            </form>
+        )
+    }
+
     if (type === "create" || type === "update") {
         return forms["todo"](setOpen, type, data, id);
     }
@@ -101,7 +141,7 @@ const FormModal = ({
     id,
 }: {
    
-    type: "create" | "update" | "delete";
+    type: "create" | "update" | "delete" | "moveToTrash";
     data?: Todo;
     id?: string | undefined;
 }) => {
@@ -111,7 +151,9 @@ const FormModal = ({
             ? "bg-yellow"
             : type === "update"
             ? "bg-sky"
-            : "bg-purple";
+            : type === "moveToTrash"
+            ? "bg-purple"
+            : "bg-red-400";
 
     const [open, setOpen] = useState(false);
 
@@ -132,7 +174,7 @@ const FormModal = ({
                 className={`${size} hover:-translate-y-0.5 hover:transition-all hover:delay-50 cursor-pointer flex items-center justify-center rounded-full ${bgColor}`}
                 
             >
-                <Image src={`/${type}.png`} alt="" width={16} height={16} />
+                <Image src={`/${type}.png`} alt="" width={16} height={16}/>
             </button>
             {open && (
                 <div className="w-screen h-screen fixed left-0 top-0 bg-black/60 dark:bg-black/40 backdrop-blur-xs z-[9999] flex items-center justify-center">

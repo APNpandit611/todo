@@ -8,7 +8,7 @@ const Navbar = async () => {
     return (
         
         <header className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white shadow-md">
-            <div className="flex justify-between items-center max-w-7xl mx-auto sm:px-8 px-4 py-4">
+            <div className="flex justify-between items-center max-w-7xl mx-auto p-4">
                 <div>
                     <Link
                         href="/"

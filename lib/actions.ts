@@ -4,6 +4,7 @@ import { TodoSchema } from "./formValidationSchemas";
 import { prisma } from "./prisma";
 import type { User } from "@clerk/nextjs/server";
 import { Prisma } from "@/app/generated/prisma/client";
+const ITEM_PER_PAGE = 5;
 
 export const createTodo = async (data: TodoSchema) => {
     try {
@@ -32,10 +33,10 @@ export const getTodos = async ({
     p: number;
     queryParams: { [key: string]: string | undefined };
 }) => {
-    const ITEM_PER_PAGE = 5;
     const user = await currentUser();
     const query: Prisma.TodoWhereInput = {
         userId: user?.id,
+        deletedAt: null,
     };
 
     try {
@@ -72,9 +73,8 @@ export const getTodos = async ({
         const [data, count] = await prisma.$transaction([
             prisma.todo.findMany({
                 where: query,
-                orderBy: {
-                    updatedAt: "desc",
-                },
+                orderBy: [{ isCompleted: "asc" }, { updatedAt: "desc" }],
+
                 take: ITEM_PER_PAGE,
                 skip: ITEM_PER_PAGE * (p - 1),
             }),
@@ -184,5 +184,55 @@ export async function toggleTodo(checked: boolean, todoId: string) {
         data: {
             isCompleted: checked,
         },
+    });
+}
+
+export async function moveToTrash(todoId: string | undefined) {
+    try {
+        await prisma.todo.update({
+            where: { id: todoId },
+            data: {
+                deletedAt: new Date(),
+            },
+        });
+
+        return { success: true, error: false };
+    } catch (error) {
+        console.log(error);
+        return { success: false, error: true };
+    }
+}
+
+export async function trashTodos({ p }: { p: number }) {
+    const user = await currentUser();
+    const query: Prisma.TodoWhereInput = {
+        userId: user?.id,
+        NOT: { deletedAt: null },
+    };
+    const [data, count] = await prisma.$transaction([
+        prisma.todo.findMany({
+            where: query,
+            orderBy: { updatedAt: "desc" },
+
+            take: ITEM_PER_PAGE,
+            skip: ITEM_PER_PAGE * (p - 1),
+        }),
+        prisma.todo.count({ where: query }),
+    ]);
+
+    return { data: data, count: count, success: true, error: false };
+}
+
+export async function emptyTrash() {
+    const user = await currentUser();
+    await prisma.todo.deleteMany({
+        where: { userId: user?.id, NOT: { deletedAt: null } },
+    });
+}
+
+export async function restoreTodo(todoId: string) {
+    await prisma.todo.update({
+        where: { id: todoId },
+        data: { deletedAt: null },
     });
 }

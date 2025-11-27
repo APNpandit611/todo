@@ -1,6 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "@/components/Navbar";
+import HeaderBar from "@/components/HeaderBar";
 
 export default function HomeLayout({
     children,
@@ -8,9 +9,10 @@ export default function HomeLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div lang="en" className="dark">
+        <div lang="en">
             <Navbar />
-            {children}
+            <HeaderBar />
+            <div className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white">{children}</div>
             <ToastContainer position="bottom-right" theme="dark" />
         </div>
     );

@@ -44,8 +44,8 @@ const TodoLists = async ({
 
     // 5. Render the list of todos
     return (
-        <div>
-            <div className="h-[calc(80vh-4rem)] overflow-y-auto py-4 px-4 md:px-8">
+        <>
+            <div className="h-[calc(80vh-4rem)] overflow-y-auto py-4">
                 <h1 className="text-3xl font-bold mb-6">Your Todos</h1>
 
                 <div className="space-y-3">
@@ -86,7 +86,7 @@ const TodoLists = async ({
                                     data={todo}
                                 />
                                 <FormModal
-                                    type="delete"
+                                    type="moveToTrash"
                                     id={todo.id}
                                     data={todo}
                                 />
@@ -96,7 +96,7 @@ const TodoLists = async ({
                 </div>
             </div>
             <Pagination page={p} count={todos?.count} />
-        </div>
+        </>
     );
 };
 
