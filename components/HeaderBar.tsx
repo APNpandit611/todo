@@ -3,10 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import FormModal from "./FormModal";
 import { prisma } from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
 
 const HeaderBar = async () => {
+    const user = await currentUser();
     const count = await prisma.todo.count({
-        where: { NOT: { deletedAt: null } },
+        where: { userId: user?.id, NOT: { deletedAt: null } },
     });
     return (
         <div className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white shadow-md">

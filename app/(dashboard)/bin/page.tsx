@@ -43,8 +43,10 @@ const TodoBin = async ({
     return (
         <div className="px-4 dark:border-slate-700 max-w-7xl mx-auto">
             <div className="h-[calc(80vh-4rem)] overflow-y-auto py-4">
-                <h1 className="text-3xl font-bold mb-6">Your Todos</h1>
-
+                <div className="flex flex-row gap-2 items-center justify-between">
+                    <h1 className="text-3xl font-bold mb-6">Your Todos</h1>
+                    <FormModal type="emptyTrash" />
+                </div>
                 <div className="space-y-3">
                     {todos.data?.map((todo) => (
                         <div

@@ -5,8 +5,8 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import Spinner from "./Spinner";
 import { Todo } from "@/app/generated/prisma/client";
-import { deleteTodo, moveToTrash } from "@/lib/actions";
-import { Loader, Loader2 } from "lucide-react";
+import { deleteTodo, emptyTrash, moveToTrash } from "@/lib/actions";
+import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 // import TeacherForm from "./forms/TeacherForm";
@@ -29,11 +29,11 @@ const forms: {
         setOpen: React.Dispatch<React.SetStateAction<boolean>>,
         type: "create" | "update",
         data?: Todo,
-        id?:string | undefined,
+        id?: string | undefined
     ) => JSX.Element;
 } = {
     todo: (setOpen, type, data, id) => (
-        <TodoForm setOpen={setOpen} type={type} data={data} id={id}/>
+        <TodoForm setOpen={setOpen} type={type} data={data} id={id} />
     ),
 };
 
@@ -43,14 +43,20 @@ const Form = ({
     data,
     setOpen,
 }: {
-    type: "create" | "update" | "delete" | "moveToTrash";
+    type:
+        | "create"
+        | "update"
+        | "delete"
+        | "moveToTrash"
+        | "emptyTrash"
+        | "restore";
     id?: string;
     data?: Todo;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [loading, setLoading] = useState<boolean | null>(false);
     const router = useRouter();
-    const handleDelete = async (e:React.MouseEvent<HTMLButtonElement>) => {
+    const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setLoading(true);
         const res = await deleteTodo(id);
@@ -64,10 +70,12 @@ const Form = ({
         }
     };
 
-    const handleMoveToTrash = async (e:React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault()
-        setLoading(true)
-        const res = await moveToTrash(id)
+    const handleMoveToTrash = async (
+        e: React.MouseEvent<HTMLButtonElement>
+    ) => {
+        e.preventDefault();
+        setLoading(true);
+        const res = await moveToTrash(id);
         if (res.success) {
             toast("Todo Moved to Bin Successfully!");
             setLoading(false);
@@ -76,7 +84,20 @@ const Form = ({
         } else {
             toast("Failed to Move Todo!");
         }
-    }
+    };
+    const handleEmptyTrash = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        const res = await emptyTrash();
+        if (res.success) {
+            toast("Trash Emptied Successfully");
+            setLoading(false);
+            setOpen(false);
+            router.refresh();
+        } else {
+            toast("Failed to empty the trash!");
+        }
+    };
 
     if (type === "delete" && id) {
         return (
@@ -107,8 +128,9 @@ const Form = ({
         return (
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
-                Are you sure you want to move
-                    this todo: <span className="text-bold">{data?.title}</span> to recycle bin?
+                    Are you sure you want to move this todo:{" "}
+                    <span className="text-bold">{data?.title}</span> to recycle
+                    bin?
                 </span>
                 <Button
                     variant="destructive"
@@ -125,7 +147,57 @@ const Form = ({
                     )}
                 </Button>
             </form>
-        )
+        );
+    }
+
+    if (type === "emptyTrash") {
+        return (
+            <form className="p-4 flex flex-col gap-4 items-center justify-center">
+                <span className="text-center font-medium">
+                    All the data will be lost permanently. Are you sure you want
+                    to empty the trash?{" "}
+                </span>
+                <Button
+                    variant="destructive"
+                    className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer"
+                    onClick={handleEmptyTrash}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Emptying...
+                        </>
+                    ) : (
+                        "Empty Trash"
+                    )}
+                </Button>
+            </form>
+        );
+    }
+
+    if (type === "restore") {
+        return (
+            <form className="p-4 flex flex-col gap-4 items-center justify-center">
+                <span className="text-center font-medium">
+                    This action will restore the item. Are you sure you want to
+                    restore {data?.title}?{" "}
+                </span>
+                <Button
+                    variant="destructive"
+                    className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer"
+                    onClick={handleEmptyTrash}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Restoring...
+                        </>
+                    ) : (
+                        "Empty Trash"
+                    )}
+                </Button>
+            </form>
+        );
     }
 
     if (type === "create" || type === "update") {
@@ -140,8 +212,13 @@ const FormModal = ({
     data,
     id,
 }: {
-   
-    type: "create" | "update" | "delete" | "moveToTrash";
+    type:
+        | "create"
+        | "update"
+        | "delete"
+        | "moveToTrash"
+        | "emptyTrash"
+        | "restore";
     data?: Todo;
     id?: string | undefined;
 }) => {
@@ -169,13 +246,30 @@ const FormModal = ({
     // }
     return (
         <>
-            <button
-                onClick={() => setOpen(true)}
-                className={`${size} hover:-translate-y-0.5 hover:transition-all hover:delay-50 cursor-pointer flex items-center justify-center rounded-full ${bgColor}`}
-                
-            >
-                <Image src={`/${type}.png`} alt="" width={16} height={16}/>
-            </button>
+            {type === "emptyTrash" ? (
+                <button
+                    onClick={() => setOpen(true)}
+                    className="px-3 py-1.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                >
+                    <Trash2 className="w-4 h-4" />
+                    Empty Trash
+                </button>
+            ) : type === "delete" ? (
+                <button
+                    onClick={() => setOpen(true)}
+                    className="p-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                >
+                    <Trash2 className="w-5 h-5"/>
+                </button>
+            ) : (
+                <button
+                    onClick={() => setOpen(true)}
+                    className={`${size} hover:-translate-y-0.5 hover:transition-all hover:delay-50 cursor-pointer flex items-center justify-center rounded-full ${bgColor}`}
+                >
+                    <Image src={`/${type}.png`} alt="" width={16} height={16} />
+                </button>
+            )}
+
             {open && (
                 <div className="w-screen h-screen fixed left-0 top-0 bg-black/60 dark:bg-black/40 backdrop-blur-xs z-[9999] flex items-center justify-center">
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-md relative w-[90%] nd:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">

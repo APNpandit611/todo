@@ -207,7 +207,7 @@ export async function trashTodos({ p }: { p: number }) {
     const user = await currentUser();
     const query: Prisma.TodoWhereInput = {
         userId: user?.id,
-        NOT: { deletedAt: null },
+        deletedAt: {not: null},
     };
     const [data, count] = await prisma.$transaction([
         prisma.todo.findMany({
@@ -219,15 +219,20 @@ export async function trashTodos({ p }: { p: number }) {
         }),
         prisma.todo.count({ where: query }),
     ]);
-
     return { data: data, count: count, success: true, error: false };
 }
 
 export async function emptyTrash() {
     const user = await currentUser();
-    await prisma.todo.deleteMany({
-        where: { userId: user?.id, NOT: { deletedAt: null } },
-    });
+    try {
+        await prisma.todo.deleteMany({
+            where: { userId: user?.id, NOT: { deletedAt: null } },
+        });
+        return { success: true, error: false };
+    } catch (error) {
+        console.log(error);
+        return { success: false, error: true };
+    }
 }
 
 export async function restoreTodo(todoId: string) {
