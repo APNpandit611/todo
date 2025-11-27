@@ -1,10 +1,9 @@
 import TodoSearch from "./TodoSearch";
 import Link from "next/link";
 import Image from "next/image";
-import FormModal from "./FormModal";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { headers } from "next/headers";
+import FormModal from "./FormModal";
 
 const HeaderBar = async () => {
     const user = await currentUser();
@@ -40,7 +39,7 @@ const HeaderBar = async () => {
                         </div>
                     </Link>
 
-                    {/* { isBinPage ? <FormModal type="create" /> : null } */}
+                    <FormModal type="create" />
                     
                     {/* <TodoLists userId={user?.id}/> */}
                 </div>

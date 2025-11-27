@@ -2,7 +2,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "@/components/Navbar";
 import HeaderBar from "@/components/HeaderBar";
-import { headers } from "next/headers";
 
 export default function HomeLayout({
     children,
