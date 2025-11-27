@@ -4,12 +4,15 @@ import Image from "next/image";
 import FormModal from "./FormModal";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 
 const HeaderBar = async () => {
     const user = await currentUser();
     const count = await prisma.todo.count({
         where: { userId: user?.id, NOT: { deletedAt: null } },
     });
+
+ 
     return (
         <div className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white shadow-md">
             <div className="max-w-7xl mx-auto my-2 sticky top-2 z-50 dark:bg-slate-900 p-4 flex items-center justify-between">
@@ -31,12 +34,14 @@ const HeaderBar = async () => {
                                 width={22}
                                 height={22}
                             />
-                            <div className="bg-red-400 absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-purple-500 text-white text-xs rounded-full">
+                            <div className="bg-red-500 absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-purple-500 text-white text-xs rounded-full">
                                 {count}
                             </div>
                         </div>
                     </Link>
-                    <FormModal type="create" />
+
+                    {/* { isBinPage ? <FormModal type="create" /> : null } */}
+                    
                     {/* <TodoLists userId={user?.id}/> */}
                 </div>
             </div>

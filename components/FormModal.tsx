@@ -5,7 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import Spinner from "./Spinner";
 import { Todo } from "@/app/generated/prisma/client";
-import { deleteTodo, emptyTrash, moveToTrash } from "@/lib/actions";
+import { deleteTodo, emptyTrash, moveToTrash, restoreTodo } from "@/lib/actions";
 import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -99,6 +99,19 @@ const Form = ({
         }
     };
 
+    const handleRestore = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        const res = await restoreTodo(id);
+        if (res.success) {
+            toast("Trash Emptied Successfully");
+            setLoading(false);
+            setOpen(false);
+            router.refresh();
+        } else {
+            toast("Failed to empty the trash!");
+        }
+    };
     if (type === "delete" && id) {
         return (
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
@@ -143,7 +156,7 @@ const Form = ({
                             Moving...
                         </>
                     ) : (
-                        "Sure"
+                        "Move Item"
                     )}
                 </Button>
             </form>
@@ -184,8 +197,8 @@ const Form = ({
                 </span>
                 <Button
                     variant="destructive"
-                    className="bg-red-500 text-white hover:bg-red-600 w-fit cursor-pointer"
-                    onClick={handleEmptyTrash}
+                    className="bg-green-600 text-white hover:bg-green-600 w-fit cursor-pointer"
+                    onClick={handleRestore}
                 >
                     {loading ? (
                         <>
@@ -193,7 +206,7 @@ const Form = ({
                             Restoring...
                         </>
                     ) : (
-                        "Empty Trash"
+                        "Restore"
                     )}
                 </Button>
             </form>
@@ -249,7 +262,7 @@ const FormModal = ({
             {type === "emptyTrash" ? (
                 <button
                     onClick={() => setOpen(true)}
-                    className="px-3 py-1.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                    className="px-3 py-1.5 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
                 >
                     <Trash2 className="w-4 h-4" />
                     Empty Trash
@@ -257,9 +270,16 @@ const FormModal = ({
             ) : type === "delete" ? (
                 <button
                     onClick={() => setOpen(true)}
-                    className="p-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                    className="p-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
                 >
                     <Trash2 className="w-5 h-5"/>
+                </button>
+            ) : type === "restore" ? (
+                <button
+                    onClick={() => setOpen(true)}
+                    className="p-1 text-sm font-medium bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                >
+                    <Image src={`/restore.png`} width={36} height={36} alt=""/>
                 </button>
             ) : (
                 <button

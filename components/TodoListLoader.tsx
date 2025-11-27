@@ -4,7 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 export const TodoListLoader = async () => {
     const user = await currentUser();
     const count = await prisma.todo.count({
-        where: { userId: user?.id },
+        where: { userId: user?.id, deletedAt: null },
     });
     return (
         <div className="h-[calc(80hv-4rem)] overflow-y-auto flex flex-col gap-8 mt-8">
