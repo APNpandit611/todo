@@ -279,7 +279,7 @@ const FormModal = ({
                     onClick={() => setOpen(true)}
                     className="p-1 text-sm font-medium bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
                 >
-                    <Image src={`/restore.png`} width={30} height={30} alt=""/>
+                    <Image src={`/restore.png`} width={28} height={28} alt=""/>
                 </button>
             ) : (
                 <button
