@@ -204,7 +204,7 @@ export async function moveToTrash(todoId: string | undefined) {
 }
 
 export async function trashTodos({ p }: { p: number }) {
-    const cutoff = new Date(Date.now() - 5 * 60 * 1000);
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const user = await currentUser();
 
     const query: Prisma.TodoWhereInput = {
