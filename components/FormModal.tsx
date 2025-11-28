@@ -5,8 +5,13 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import Spinner from "./Spinner";
 import { Todo } from "@/app/generated/prisma/client";
-import { deleteTodo, emptyTrash, moveToTrash, restoreTodo } from "@/lib/actions";
-import { Loader2, Trash2 } from "lucide-react";
+import {
+    deleteTodo,
+    emptyTrash,
+    moveToTrash,
+    restoreTodo,
+} from "@/lib/actions";
+import { ArchiveRestore, Loader2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 // import TeacherForm from "./forms/TeacherForm";
@@ -117,7 +122,7 @@ const Form = ({
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
                     All the data will be lost. Are you sure you want to delete
-                    this todo: <span className="text-bold">{data?.title}</span>?
+                    this todo: <span className="font-bold">{data?.title}</span>?
                 </span>
                 <Button
                     variant="destructive"
@@ -141,8 +146,8 @@ const Form = ({
         return (
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
-                    Are you sure you want to move this todo:{" "}
-                    <span className="text-bold">{data?.title}</span> to recycle
+                    Are you sure you want to move todo {" "}
+                    <span className="font-bold">{data?.title}</span> to recycle
                     bin?
                 </span>
                 <Button
@@ -167,7 +172,7 @@ const Form = ({
         return (
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
-                    All the data will be lost permanently. Are you sure you want
+                    All the data will be lost <span className="font-bold">permanently</span>. Are you sure you want
                     to empty the trash?{" "}
                 </span>
                 <Button
@@ -193,7 +198,7 @@ const Form = ({
             <form className="p-4 flex flex-col gap-4 items-center justify-center">
                 <span className="text-center font-medium">
                     This action will restore the item. Are you sure you want to
-                    restore {data?.title}?{" "}
+                    restore: <span className="font-bold">{data?.title}</span>?
                 </span>
                 <Button
                     variant="destructive"
@@ -270,16 +275,17 @@ const FormModal = ({
             ) : type === "delete" ? (
                 <button
                     onClick={() => setOpen(true)}
-                    className="p-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                    className="w-8 h-8 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-sm hover:shadow transition-all"
                 >
-                    <Trash2 className="w-5 h-5"/>
+                    <Trash2 className="w-4 h-4" />
                 </button>
             ) : type === "restore" ? (
                 <button
                     onClick={() => setOpen(true)}
-                    className="p-1 text-sm font-medium bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
+                    className="w-8 h-8 text-sm font-medium bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-sm hover:shadow transition-all"
                 >
-                    <Image src={`/restore.png`} width={28} height={28} alt=""/>
+                    {/* <Image src={`/restore.png`} width={16} height={16} alt="" /> */}
+                    <ArchiveRestore className="w-4 h-4" />
                 </button>
             ) : (
                 <button

@@ -11,8 +11,8 @@ export default function HomeLayout({
     return (
         <div lang="en">
             <Navbar />
-            <HeaderBar/>
             <div className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white">
+            <HeaderBar/>
                 {children}
             </div>
             <ToastContainer position="bottom-right" theme="dark" />
