@@ -205,12 +205,16 @@ export async function moveToTrash(todoId: string | undefined) {
 
 export async function trashTodos({ p }: { p: number }) {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // const cutoff = new Date(Date.now() - 3 * 60 * 1000);
     const user = await currentUser();
 
     const query: Prisma.TodoWhereInput = {
         userId: user?.id,
         deletedAt: { not: null },
     };
+    await prisma.todo.deleteMany({
+        where: { deletedAt: { lte: cutoff } },
+    });
     const [data, count] = await prisma.$transaction([
         prisma.todo.findMany({
             where: query,
@@ -221,9 +225,7 @@ export async function trashTodos({ p }: { p: number }) {
         }),
         prisma.todo.count({ where: query }),
     ]);
-    await prisma.todo.deleteMany({
-        where: { deletedAt: { lte: cutoff } },
-    });
+    
     return { data: data, count: count, success: true, error: false };
 }
 
@@ -252,4 +254,13 @@ export async function restoreTodo(todoId: string | undefined) {
         console.log(error);
         return { success: false, error: true };
     }
+}
+
+export async function countTrashTodo(userId: string | undefined) {
+    const count = await prisma.todo.count({
+        where: { userId: userId, NOT: { deletedAt: null } },
+    });
+
+    return count
+
 }

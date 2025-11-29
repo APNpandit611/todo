@@ -1,43 +1,63 @@
-import { formatDistanceToNow } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import FormModal from './FormModal';
-import { trashTodos } from '@/lib/actions';
-import { currentUser } from '@clerk/nextjs/server';
-import Pagination from './Pagination';
+import { formatDistanceToNow } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import FormModal from "./FormModal";
+// import { trashTodos } from "@/lib/actions";
+// import { currentUser } from "@clerk/nextjs/server";
+// import Pagination from "./Pagination";
+// import { Todo } from "@/app/generated/prisma/client";
 
-const BinList = async ({
-    searchParams,
-}: {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-}) => {
-    const user = await currentUser();
-    const { page } = await searchParams;
-    const p = page ? parseInt(page) : 1;
+// // {
+//     searchParams,
+// }: {
+//     searchParams: Promise<{ [key: string]: string | undefined }>;
+// }
 
-    // 2. If no user, show a message or redirect
-    if (!user) {
-        return (
-            <div className="container mx-auto p-6">
-                <p className="text-center text-gray-500">
-                    Please log in to see your todos.
-                </p>
-            </div>
-        );
-    }
+type BinListProps = {
+    todos: {
+        data: {
+            id: string;
+            title: string;
+            isCompleted: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            userId: string;
+        }[];
+        count: number;
+        success: boolean;
+        error: boolean;
+    };
+};
 
-    //fetch the data and queryparams
-    const todos = await trashTodos({ p });
+const BinList = async ({ todos }: BinListProps) => {
+    // const user = await currentUser();
+    // const { page } = await searchParams;
+    // const p = page ? parseInt(page) : 1;
 
-    // 4. Handle the case where there are no todos
-    if (todos.data?.length === 0) {
-        return (
-            <div className="container mx-auto p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                    Your Todo Recycle Bin is Empty!
-                </p>
-            </div>
-        );
-    }
+    // // 2. If no user, show a message or redirect
+    // if (!user) {
+    //     return (
+    //         <div className="container mx-auto p-6">
+    //             <p className="text-center text-gray-500">
+    //                 Please log in to see your todos.
+    //             </p>
+    //         </div>
+    //     );
+    // }
+
+    // //fetch the data and queryparams
+    // const todos = await trashTodos({ p });
+
+    // // 4. Handle the case where there are no todos
+    // if (todos.data?.length === 0) {
+    //     return (
+    //         <div className="container mx-auto p-6 text-center">
+    //             <p className="text-gray-500 dark:text-gray-400">
+    //                 Your Todo Recycle Bin is Empty!
+    //             </p>
+    //         </div>
+    //     );
+    // }
 
     // 5. Render the list of todos
     return (
@@ -48,7 +68,8 @@ const BinList = async ({
                     <FormModal type="emptyTrash" />
                 </div>
                 <div className="space-y-3">
-                    {todos.data?.map((todo) => (
+                
+                    {todos?.data?.map((todo) => (
                         <div
                             key={todo.id}
                             className="flex flex-col md:flex-row md:gap-4 p-4 rounded-lg border dark:bg-slate-900 border-gray-200 dark:border-slate-700 shadow-sm"
@@ -67,11 +88,17 @@ const BinList = async ({
                                     <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-500 dark:bg-slate-900">
                                         <CalendarIcon className="h-3.5 w-3.5" />
                                         <span className="text-xs">
-                                            Created{" "}
-                                            {formatDistanceToNow(
-                                                new Date(todo.createdAt),
+                                            {/* Created{" "} */}
+                                            {/* {formatDistanceToNow(
+                                                new Date(todo.deletedAt),
                                                 { addSuffix: true }
-                                            )}
+                                            )} */}
+                                            Deleted{" "}
+                                            {todo.deletedAt &&
+                                                formatDistanceToNow(
+                                                    new Date(todo.deletedAt),
+                                                    { addSuffix: true }
+                                                )}
                                         </span>
                                     </div>
                                 </div>
@@ -92,9 +119,9 @@ const BinList = async ({
                     ))}
                 </div>
             </div>
-            <Pagination page={p} count={todos?.count} />
+            {/* <Pagination page={p} count={todos?.count} /> */}
         </div>
     );
 };
 
-export default BinList
+export default BinList;

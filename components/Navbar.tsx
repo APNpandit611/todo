@@ -1,10 +1,10 @@
-import { UserButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
+"use client"
+import { UserButton, useUser } from "@clerk/nextjs";
+// import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
-import Switch from "./ToggleButton";
 
-const Navbar = async () => {
-    const user = await currentUser();
+const Navbar = () => {
+    const { user } =  useUser();
     return (
         
         <header className="w-full dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-white shadow-md">
@@ -32,7 +32,7 @@ const Navbar = async () => {
                     <div className="flex items-center gap-x-3 md:p-2.5 shadow-md rounded-full md:rounded-md border dark:border-white">
                         <div className="hidden md:flex md:items-center md:gap-3">
                             <div className="flex flex-col text-right">
-                                <p className="text-sm font-semibold dark:text-white">
+                                <p className="text-sm font-semibold dark:text-white capitalize">
                                     {user?.fullName || "User"}
                                 </p>
                                 <p className="text-xs text-zinc-500">
